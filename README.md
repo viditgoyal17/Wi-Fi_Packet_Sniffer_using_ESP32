@@ -4,14 +4,6 @@
 
 **Implementation of a Wi-Fi Sniffer Device Driver using ESP32 and ESP-IDF**
 
-## Group Member Contribution
-
-| Member Name    | Student Number   | Contribution (%) |
-|----------------|-----------------|-----------------|
-| Vidit Goyal    | 2021B4AA2944G   | 33%             |
-| Kalash Poddar  | 2021B4AA3025G   | 33%             |
-| Thejas Mouli   | 2021B4A32518G   | 33%             |
-
 ## Problem Statement and Introduction
 
 The objective of this project is to develop a simple device driver on the ESP32 microcontroller that can capture and display nearby Wi-Fi packets without connecting to any specific network. By configuring the ESP32 into promiscuous mode, the device can receive all Wi-Fi packets broadcasted in its vicinity. This allows us to extract and present key information such as MAC addresses, signal strength, and SSID (when available), providing insights into the local wireless environment. This project demonstrates device driver development and how operating systems communicate directly with hardware.
