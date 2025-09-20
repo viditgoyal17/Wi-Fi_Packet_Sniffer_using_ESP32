@@ -1,145 +1,120 @@
-# ESP32 Wi-Fi Sniffer
+# Wi-Fi Packet Sniffer using ESP32 and FreeRTOS
 
-## Project Overview
-This project implements a simple Wi-Fi **packet sniffer** on the ESP32 using the **ESP-IDF** framework.  
-By enabling promiscuous mode, the ESP32 can capture all nearby Wi-Fi packets without joining any specific network. The application extracts and prints useful details such as:
-
-- **MAC Address** of the sender
-- **RSSI (signal strength)**
-- **SSID** (when available, e.g., in Beacon or Probe Response frames)
-
-This project demonstrates how a device driver interacts with hardware at the operating system level and provides insight into low-level wireless communication.
-
-⚠️ **Disclaimer:** This project is intended only for educational and authorized research purposes. Please follow your local regulations regarding wireless monitoring.
+This project implements a **Wi-Fi packet sniffer** on the **ESP32** microcontroller using the **ESP-IDF framework**.  
+It captures Wi-Fi packets in **promiscuous mode**, parses metadata such as RSSI, MAC addresses, SSID, and frame types, and performs **automatic channel hopping** to scan across all 2.4 GHz Wi-Fi channels.  
 
 ---
 
-## Features
-- Runs on any ESP32 development board.
-- Captures Wi-Fi packets in promiscuous mode.
-- Extracts MAC addresses, RSSI, and SSIDs from packets.
-- Implements channel-hopping for wider packet capture.
-- Prints packet data in real-time to the serial console.
+## 🛠️ Requirements
+
+- **ESP32 Development Board** (e.g., ESP32-DevKitC, NodeMCU-ESP32, etc.)
+- **USB Cable** to connect ESP32 to PC
+- **VS Code** with the following:
+  - [ESP-IDF Extension](https://marketplace.visualstudio.com/items?itemName=espressif.esp-idf-extension) installed
+  - [C/C++ Extension Pack](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools-extension-pack) installed
+- **ESP-IDF Toolchain** properly set up on your system
+  - [ESP-IDF Setup Guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html)
+- Serial Monitor (VS Code, `idf.py monitor`, or any terminal program)
 
 ---
 
-## Repository Structure
+## 📂 Project Setup
 
-```
+1. **Clone or create a new ESP-IDF project**:
+   ```bash
+   idf.py create-project wifi_sniffer
+   cd wifi_sniffer
+   ```
 
-Wifi\_Sniffer\_Code/
-├── CMakeLists.txt        # Root build file
-├── sdkconfig.defaults    # Default project configuration
-├── main/
-│   ├── CMakeLists.txt    # Build file for app sources
-│   └── main.c            # Application source code
-├── components/           # (Optional) Custom components if needed
-└── README.md             # Project documentation
+2. **Replace `main/main.c` with the provided code** (your Wi-Fi sniffer code).
 
-````
+3. **Ensure `CMakeLists.txt` includes required components**:
 
----
+   ```cmake
+   idf_component_register(SRCS "main.c"
+                          INCLUDE_DIRS ".")
+   ```
 
-## Getting Started
+4. **Build the project**:
 
-### Prerequisites
-1. **ESP-IDF Framework**  
-   Install ESP-IDF by following the official guide:  
-   [ESP-IDF Get Started](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/)
-
-2. **Hardware**  
-   - ESP32 Development board  
-   - USB cable  
+   ```bash
+   idf.py build
+   ```
 
 ---
 
-### Setup Instructions
+## 🔌 Flash and Run
 
-1. **Clone the repository**
+1. **Connect your ESP32** board via USB.
 
-```bash
-git clone https://github.com/<your-username>/Wi-Fi_Packet_Sniffer.git
-cd Wi-Fi_Packet_Sniffer
-````
+2. **Flash the firmware**:
 
-2. **Set up ESP-IDF environment**
+   ```bash
+   idf.py -p <PORT> flash
+   ```
 
-```bash
-. $HOME/esp/esp-idf/export.sh
-```
+   Replace `<PORT>` with the actual serial port (e.g., `COM3` on Windows or `/dev/ttyUSB0` on Linux).
 
-3. **Select target**
+3. **Open the Serial Monitor**:
 
-```bash
-idf.py set-target esp32
-```
+   ```bash
+   idf.py -p <PORT> monitor
+   ```
 
-4. **Apply default configuration**
-
-```bash
-idf.py defconfig
-```
-
-5. **Build the project**
-
-```bash
-idf.py build
-```
-
-6. **Flash to ESP32**
-
-```bash
-idf.py -p /dev/ttyUSB0 flash
-```
-
-7. **Monitor output**
-
-```bash
-idf.py -p /dev/ttyUSB0 monitor
-```
-
-> Replace `/dev/ttyUSB0` with the correct port on your system (e.g., `COM3` on Windows).
+   (Press `Ctrl+]` to exit.)
 
 ---
 
-## Expected Output
+## 📡 Expected Output
 
-Once flashed and running, the ESP32 will print captured Wi-Fi packet information like:
+Once flashed and running, the ESP32 will:
+
+* Enable Wi-Fi in **promiscuous mode**
+
+* Print detected packet details every 1 second:
+
+  * **Channel number**
+  * **RSSI (signal strength)**
+  * **Packet Type** (Beacon, Probe Request, Probe Response, Data, etc.)
+  * **Source and Destination MAC addresses**
+  * **SSID** (if available, otherwise `(Hidden)`)
+
+* Automatically **switch channels every 2 seconds**, cycling through channels **1–13**.
+
+Example Output:
 
 ```
-Packet captured:
-  MAC: 3C:71:BF:AA:22:11
-  RSSI: -55 dBm
-  SSID: MyWiFiNetwork
+--- Switching to Channel 6 ---
+---------------------------------
+Channel: 6
+RSSI: -55 dBm
+Packet Type: Beacon
+Source MAC: 34:45:12:ab:cd:ef
+Destination MAC: ff:ff:ff:ff:ff:ff
+SSID: MyHomeWiFi
 ```
 
-The output updates continuously as packets are detected. With channel-hopping enabled, you’ll see packets across multiple Wi-Fi channels.
+---
+
+## ⚠️ Notes
+
+* This code **does not connect** to any Wi-Fi network; it only **listens** to packets in the air.
+* Works only in countries where **monitoring Wi-Fi is legal**. Use responsibly.
+* SSIDs may appear as **(Hidden)** if the network has disabled broadcasting.
+* RSSI values are negative (closer to 0 means stronger signal).
 
 ---
 
-## Customization
+## 📚 References
 
-* Adjust **channel-hopping interval** in `main.c` to control how often channels change.
-* Filter packet types (Beacon, Probe Request, etc.) inside the packet handler function.
-* Extend code to log packets to storage (e.g., SPIFFS, SD card) instead of just printing.
-
----
-
-## Troubleshooting
-
-* **Upload failure**
-
-  * Check correct COM port or USB device.
-  * Try reducing baud rate in `menuconfig`.
-
-* **No packets seen**
-
-  * Ensure there are Wi-Fi networks nearby.
-  * Confirm the ESP32 is in promiscuous mode.
-  * Try moving closer to an access point.
+* [ESP-IDF Wi-Fi Sniffer Example](https://github.com/espressif/esp-idf/tree/master/examples/wifi/sniffer)
+* [FreeRTOS API Reference](https://www.freertos.org/a00106.html)
+* [ESP-IDF Programming Guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/)
 
 ---
 
-## Author
+# Author
 
-Developed by **Vidit Goyal**
+Devloped by Vidit Goyal
+
+---
