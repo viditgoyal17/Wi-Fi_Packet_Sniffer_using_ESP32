@@ -1,7 +1,7 @@
 # Wi-Fi Packet Sniffer using ESP32 and FreeRTOS
 
 This project implements a **Wi-Fi packet sniffer** on the **ESP32** microcontroller using the **ESP-IDF framework**.  
-It captures Wi-Fi packets in **promiscuous mode**, parses metadata such as RSSI, MAC addresses, SSID, and frame types, and performs **automatic channel hopping** to scan across all 2.4 GHz Wi-Fi channels.  
+It captures Wi-Fi packets in **promiscuous mode** (using the ESP-IDF promiscuous callback), parses metadata such as RSSI, MAC addresses, SSID, and frame types, and performs **automatic channel hopping** to scan across all 2.4 GHz Wi-Fi channels (channels 1–13).
 
 ---
 
@@ -35,7 +35,13 @@ It captures Wi-Fi packets in **promiscuous mode**, parses metadata such as RSSI,
                           INCLUDE_DIRS ".")
    ```
 
-4. **Build the project**:
+4. **Set the target chip (if not already set):**
+
+   ```bash
+   idf.py set-target esp32
+   ```
+
+5. **Build the project**:
 
    ```bash
    idf.py build
@@ -67,17 +73,17 @@ It captures Wi-Fi packets in **promiscuous mode**, parses metadata such as RSSI,
 
 ## 📡 Expected Output
 
+
 Once flashed and running, the ESP32 will:
 
-* Enable Wi-Fi in **promiscuous mode**
+* Enable Wi-Fi in **promiscuous mode** using the ESP-IDF promiscuous callback (`esp_wifi_set_promiscuous_rx_cb`).
 
-* Print detected packet details every 1 second:
-
-  * **Channel number**
-  * **RSSI (signal strength)**
-  * **Packet Type** (Beacon, Probe Request, Probe Response, Data, etc.)
-  * **Source and Destination MAC addresses**
-  * **SSID** (if available, otherwise `(Hidden)`)
+* Print detected packet details **at most once per second** (rate-limited to avoid flooding the serial output):
+   * **Channel number** (2.4 GHz, channels 1–13 only)
+   * **RSSI (signal strength)**
+   * **Packet Type** (Beacon, Probe Request, Probe Response, Data, etc.)
+   * **Source and Destination MAC addresses**
+   * **SSID** (if available, otherwise `(Hidden)`; determined by SSID length in the packet)
 
 * Automatically **switch channels every 2 seconds**, cycling through channels **1–13**.
 
@@ -96,11 +102,12 @@ SSID: MyHomeWiFi
 
 ---
 
+
 ## ⚠️ Notes
 
 * This code **does not connect** to any Wi-Fi network; it only **listens** to packets in the air.
 * Works only in countries where **monitoring Wi-Fi is legal**. Use responsibly.
-* SSIDs may appear as **(Hidden)** if the network has disabled broadcasting.
+* SSIDs may appear as **(Hidden)** if the network has disabled broadcasting or the SSID length is zero in the packet.
 * RSSI values are negative (closer to 0 means stronger signal).
 
 ---
