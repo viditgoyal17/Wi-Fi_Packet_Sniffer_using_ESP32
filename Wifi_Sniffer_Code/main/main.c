@@ -27,7 +27,7 @@ static void wifi_sniffer_packet_handler(void* buff, wifi_promiscuous_pkt_type_t 
     
     int64_t now = esp_timer_get_time(); // current time in microseconds
 
-    if (now - last_print_time < 1000000) { 
+    if (now - last_print_time < 1000000) {       // 1 second rate limit
         return; 
     }
     last_print_time = now; 
