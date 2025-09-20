@@ -140,12 +140,6 @@ The output updates continuously as packets are detected. With channel-hopping en
 
 ---
 
-## License
-
-This project is licensed under the **MIT License**. See [LICENSE](LICENSE) for details.
-
----
-
 ## Author
 
 Developed by **Vidit Goyal**
