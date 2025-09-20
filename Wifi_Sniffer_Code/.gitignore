@@ -1,0 +1,24 @@
+# ESP-IDF build / artefacts
+/build/
+/sdkconfig
+/sdkconfig.old
+/flash_project_name.bin
+
+# Visual Studio / Editors
+.vscode/
+.idea/
+*.suo
+*.user
+*.userprefs
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python / virtual env
+venv/
+.env/
+
+# Misc
+*.log
+*.bin
