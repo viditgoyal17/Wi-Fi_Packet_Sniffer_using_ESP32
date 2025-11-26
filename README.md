@@ -122,6 +122,6 @@ SSID: MyHomeWiFi
 
 # Author
 
-Devloped by Vidit Goyal
+Developed by Vidit Goyal
 
 ---
